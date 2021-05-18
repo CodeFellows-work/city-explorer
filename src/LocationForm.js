@@ -14,24 +14,34 @@ class LocationForm extends React.Component{
     this.state = {
         data: [], 
         location: {}, 
-        search: '',
+        search: '', 
+    
     }
   }
 
 setLocation = (locationObj) => {
     this.setState({location: locationObj }, () => console.log(this.state));
 }
-fetchLocation = async () => {
-    let response = await axios.get(`https://us1.locationiq.com/v1/search.php?key=${API_KEY}&q=${this.state.search}&format=json`);
+fetchLocationRegionOne = async () => {
+    let response = await axios.get((`https://us1.locationiq.com/v1/search.php?key=${API_KEY}&q=${this.state.search}&format=json`));
     this.setLocation(response.data[0]); 
+}
+fetchLocationRegionTwo = async () => {
+    let response = await axios.get((`https://eu1.locationiq.com/v1/search.php?key=${API_KEY}&q=${this.state.search}&format=json`));
+    this.setLocation(response.data[0]); 
+}
+fetchLocationMap = async () => {
+    let response = await axios.get((`https://maps.locationiq.com/v3/staticmap?key=${API_KEY}&lat=${this.state.location.lat}&lon=${this.state.location.lon}&zoom=${15}&format=json`));
+    this.setLocation(response.data[0]);
 }
 
 render() {
     return(
         <div className='locationForm'>
             <input onChange={(e) => this.setState({search: e.target.value})} type='text' /> 
-            <button onClick={this.fetchLocation}>Explore!</button>
-            <div>{this.state.location.display_name ? <img src={this.state.location.icon} alt={this.state.location.display_name} /> : ''}</div>
+            <button onClick={() => {this.fetchLocationRegionOne(); this.fetchLocationRegionTwo(); this.fetchLocationMap()}}>Explore</button>
+            <div>{this.state.location.display_name ? <div>{this.state.location.display_name}, Latitude: {this.state.location.lat}, Longitude: {this.state.location.lon}</div> : ''}</div>
+            
         </div>
     );
     }
