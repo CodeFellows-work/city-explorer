@@ -14,7 +14,7 @@ class Weather extends React.Component {
     getWeather= async () => {
         const API = 'http://localhost:3000'; 
         const weather = await axios.get(`${API}/weather`);
-        this.setState({ weather: weather.data}); 
+        this.setState({ weather: [weather.data.lat, weather.data.lon] }); 
         
     }
     // handleWeather = (e) => {
