@@ -3,7 +3,7 @@ import axios from 'axios';
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'; 
-
+import Weather from './Weather';
 // import Form from 'react-bootstrap/Form';
 
 
@@ -57,6 +57,7 @@ render() {
                     <div id="locationTitle">{this.state.location.display_name ? <div>{this.state.location.display_name}, {this.state.location.lat}, {this.state.location.lon}</div> : ''}</div>
                 </Form.Text>
                 <img src={this.state.map ? this.state.map : null} alt="Location-Map" /> 
+                <Weather location = {this.state.location} search = {this.state.search} /> 
             </Form>
         </div>
         
