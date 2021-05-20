@@ -3,65 +3,62 @@ import axios from 'axios';
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'; 
-import Weather from './Weather';
+
+
+
 // import Form from 'react-bootstrap/Form';
 
 
-const API_KEY = process.env.REACT_APP_API_KEY; 
-
+// const API_KEY = process.env.REACT_APP_API_KEY; 
+// const WEATHER_KEY = process.env.API_APP_WEATHER_KEY; 
 class LocationForm extends React.Component{ 
     constructor() {
         super();
     this.state = {
-        data: [], 
+        data: {},
+        map: {},
+        weather: {},
+        search: '',  
         location: {}, 
-        search: '',
-        map: null,  
-    
+        // location: {}, 
+        // map: null,  
+        // weather: null, 
         }
     }
 
-handleFunction = (e) => {
-    axios.get(`https://us1.locationiq.com/v1/search.php?key=${API_KEY}&q=${this.state.search}&format=json`)
-        .then(response => {
-            let location = response.data[0]; 
-            this.setState({
-                location: location,
-                map: `https://maps.locationiq.com/v3/staticmap?key=${API_KEY}&center=${location.lat},${location.lon}&zoom=15`
-            })
-        })
-        .catch(error => {console.log("Error, can not be displayed")})
-    }
-handleRegion2 = (e) => {
-    axios.get(`https://eu1.locationiq.com/v1/search.php?key=${API_KEY}&q=${this.state.search}&format=json`)
-        .then(response => {
-            let location = response.data[0]; 
-            this.setState({
-                location: location,
-                map: `https://maps.locationiq.com/v3/staticmap?key=${API_KEY}&center=${location.lat},${location.lon}&zoom=15`
-            })
-        })
-        .catch(error => {console.log("Error, can not be displayed")})
-    }
+
+componentDidMount = () => {
+    this.getLocation();
+    this.getWeather();
+}     
+getLocation = async (e) => {
+    let response = await axios.get(`http://localhost:3000/location?search=${this.state.search}`);
+    this.setState({
+        data: response.data, 
+    });
+}
+getWeather = async (e) => {
+    let response = await axios.get(`http://localhost:3000/weather?search=${this.state.search}`)
+    this.setState ({
+        weather: response.data, 
+    });
+}
 
 render() {
     return(
-        
-        <div className='locationForm'>
-            <Form>
-                <Form.Label>Search Location: 
-                    <input onChange={(e) => this.setState({search: e.target.value})} placeholder = 'Input a Location' type='text' /> 
-                </Form.Label>
-                <Button variant="outline-primary" type="button" onClick={this.handleFunction, this.handleRegion2}>Explore</Button>
-                <Form.Text>
-                    <div id="locationTitle">{this.state.location.display_name ? <div>{this.state.location.display_name}, {this.state.location.lat}, {this.state.location.lon}</div> : ''}</div>
-                </Form.Text>
-                <img src={this.state.map ? this.state.map : null} alt="Location-Map" /> 
-                <Weather location = {this.state.location} search = {this.state.search} /> 
-            </Form>
-        </div>
-        
+        <>
+        <Form>
+            <Form.Label>City Explorer</Form.Label>
+            <input onChange={(e) => this.setState({search: e.target.value})} placeholder='Enter Location' type='text' />
+            <Button variant='outline-primary' onClick={this.getLocation, this.getWeather}> Get Location </Button> 
+            <Form.Text>
+            <div>{this.state.data.display_name ? <div>{this.state.data.display_name}, {this.state.data.lat},{this.state.data.lon}</div> : ''}</div>
+            </Form.Text>
+            <div>{console.log(this.state.weather)}</div>
+            <img src={this.state.map ? this.state.map : null} alt="Location Map" />
+        </Form>
+        </>
     );
-    }
+}
 }
 export default LocationForm; 
