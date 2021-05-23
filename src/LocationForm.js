@@ -3,23 +3,22 @@ import axios from 'axios';
 import React from 'react';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'; 
+import WeatherCards from './weather/WeatherCards'; 
+import MovieCards from './movie/MovieCards'
+import './location.css'
 
 
+const API_KEY = process.env.REACT_APP_API_KEY; 
 
-// import Form from 'react-bootstrap/Form';
-
-
-// const API_KEY = process.env.REACT_APP_API_KEY; 
-// const WEATHER_KEY = process.env.API_APP_WEATHER_KEY; 
 class LocationForm extends React.Component{ 
     constructor() {
         super();
     this.state = {
         data: [],
-        map: null,
-        weather: {},
+        map: '',
+        weather: [],
         search: '',
-        movie: null,  
+        movie:[],  
         }
     }
 
@@ -30,52 +29,53 @@ componentDidMount = () => {
 getLocation = async (e) => {
     let response = await axios.get(`http://localhost:3000/location?search=${this.state.search}`)
     .then(response => {
-        this.setState({data: response.data[0],})
-        this.getWeather() 
+        this.setState({data: response.data[0]})
         this.getMap()
+        this.getWeather() 
         this.getMovie()
     })
     console.log(response); 
 }
 getWeather = async (e) => {
     let response = await axios.get(`http://localhost:3000/weather?lat=${this.state.data.lat}&lon=${this.state.data.lon}`)
-        this.setState({weather: response.data[0]});
-    console.log(response);
+        this.setState({weather: response.data});
 }
 getMap = async (e) => {
-    let response = await axios.get(`http://localhost:3000/map?lat=${this.state.data.lat}&lon=${this.state.data.lon}`)
-        this.setState({map: response.data[0]})
+        this.setState({map:`https://maps.locationiq.com/v3/staticmap?key=${API_KEY}&center=${this.state.data.lat},${this.state.data.lon}&zoom=15`});       
 }
 getMovie = async (e) => {
-    let response = await axios.get(`http://localhost:3000/movie?search=${this.state.search}`)
-        this.setState({movie: response.data[0]})
+    let response = await axios.get(`http://localhost:3000/movie?query=${this.state.search}`)
+        this.setState({movie: response.data});
 }
-// renderWeather = () => {
-//     let weatherArray = [];
-//     for(let i =0; i<this.state.weather.data; i++){
-//         weatherArray.push(this.state.weather.data[i]); 
-//     }
-//     return weatherArray; 
-// }
 
 render() {
     console.log(this.state);
+    // console.log(this.state.movie.results);
+    console.log(this.state.weather);
+
     return(
-        <>
-        <Form>
-            <Form.Label>City Explorer</Form.Label>
-            <input onChange={(e) => this.setState({search: e.target.value})} placeholder='Enter Location' type='text' />
-            <Button variant='outline-primary' onClick={this.getLocation}> Get Location </Button> 
+        
+        <div id="formSearchLoc">
+        <Form style={{marginTop: '25%'}}>
+            <Form.Label style={{color: 'white',fontSize:'70pt'}}>City Explorer</Form.Label>
+            <Form.Control size="large" onChange={(e) => this.setState({search: e.target.value})} placeholder='Enter Location' type='text' />
+            <Button variant='primary' onClick={this.getLocation}> Get Location </Button> 
             <Form.Text>
             <div>{this.state.data.display_name ? <div>{this.state.data.display_name}, {this.state.data.lat},{this.state.data.lon}</div> : ''}</div>
             </Form.Text>
-            <img src={this.state.map ? this.state.map : null} alt="Location Map" />
-            <Form.Text>
-            <ul>{this.state.weather.date ? <div>{this.state.weather.date}, {this.state.weather.description}</div> : ''}</ul>
-            </Form.Text>
-            
+            <div>
+                {this.state.map ? <img src={this.state.map} alt='static map'/>  : '' } 
+            </div>
+             <div>
+                {this.state.weather.map(item => { return <WeatherCards date={item.date} description ={item.description}/> })}
+            </div>  
+            <div>
+                {this.state.movie.map(item => { return<div>Check Out Some Movies:<MovieCards title={item.title} src={item.poster_path} overview = {item.overview}/></div> })}
+            </div> 
+                
+           
         </Form>
-        </>
+        </div>
     );
 }
 }
