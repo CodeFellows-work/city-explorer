@@ -12,14 +12,12 @@ class WeatherCards extends React.Component {
 render() {
     return (
         <div id= "weatherCards">
-        
         <Card style={{width: '400px'}} bg='primary' text='white'> 
             <Card.Body>
             <Card.Title>{this.props.date}</Card.Title>
             <Card.Text>{this.props.description}</Card.Text>
             </Card.Body> 
         </Card>
-
         </div>
     )
 }

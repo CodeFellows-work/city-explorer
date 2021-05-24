@@ -66,14 +66,12 @@ render() {
             <div>
                 {this.state.map ? <img src={this.state.map} alt='static map'/>  : '' } 
             </div>
-             <div>
+            <div>
                 {this.state.weather.map(item => { return <WeatherCards date={item.date} description ={item.description}/> })}
             </div>  
             <div>
                 {this.state.movie.map(item => { return<div>Check Out Some Movies:<MovieCards title={item.title} src={item.poster_path} overview = {item.overview}/></div> })}
-            </div> 
-                
-           
+            </div>           
         </Form>
         </div>
     );
